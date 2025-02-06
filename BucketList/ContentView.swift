@@ -48,6 +48,16 @@ struct ContentView: View {
                         viewModel.update(location: $0)
                     }
                 }
+                .mapStyle(viewModel.standard ? .standard : .hybrid)
+            }
+            if viewModel.standard {
+                Button("Hybrid") {
+                    viewModel.toggleStandard()
+                }
+            } else {
+                Button("Standard") {
+                    viewModel.toggleStandard()
+                }
             }
         } else {
             Button("Unlock Places", action: viewModel.authenticate)

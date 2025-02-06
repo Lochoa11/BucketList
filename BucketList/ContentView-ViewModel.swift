@@ -19,6 +19,8 @@ extension ContentView {
         
         var isUnlocked = false
         
+        var standard = true
+        
         init() {
             do {
                 let data = try Data(contentsOf: savePath)
@@ -70,6 +72,10 @@ extension ContentView {
             } else {
                 // no biometrics
             }
+        }
+        
+        func toggleStandard() {
+            standard.toggle()
         }
     }
     
