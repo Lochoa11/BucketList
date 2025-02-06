@@ -41,7 +41,7 @@ struct EditView: View {
             .navigationTitle("Place details")
             .toolbar {
                 Button("Save") {
-                    let newLocation = viewModel.createNewLocation()                    
+                    let newLocation = viewModel.createNewLocation()
                     onSave(newLocation)
                     dismiss()
                 }
@@ -58,6 +58,6 @@ struct EditView: View {
     }
 }
 
-//#Preview {
-//    EditView(location: .example) { _ in }
-//}
+#Preview {
+    EditView(location: .example) { _ in }
+}
