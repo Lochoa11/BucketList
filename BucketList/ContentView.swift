@@ -19,45 +19,49 @@ struct ContentView: View {
     )
     
     @State private var viewModel = ViewModel()
+    @AppStorage("mapStyle") private var mapStyle = "standard"
     
     var body: some View {
         if viewModel.isUnlocked {
-            MapReader { proxy in
-                Map(initialPosition: startPosition){
-                    ForEach(viewModel.locations) { location in
-                        Annotation(location.name, coordinate: location.coordinate) {
-                            Image(systemName: "star.circle")
-                                .resizable()
-                                .foregroundStyle(.red)
-                                .frame(width: 44, height: 44)
-                                .background(.white)
-                                .clipShape(.circle)
-                                .onLongPressGesture(minimumDuration: 0.2) {
-                                    viewModel.selectedPlace = location
-                                }
+            VStack {
+                MapReader { proxy in
+                    Map(initialPosition: startPosition){
+                        ForEach(viewModel.locations) { location in
+                            Annotation(location.name, coordinate: location.coordinate) {
+                                Image(systemName: "star.circle")
+                                    .resizable()
+                                    .foregroundStyle(.red)
+                                    .frame(width: 44, height: 44)
+                                    .background(.white)
+                                    .clipShape(.circle)
+                                    .onLongPressGesture(minimumDuration: 0.2) {
+                                        viewModel.selectedPlace = location
+                                    }
+                            }
                         }
                     }
-                }
-                .onTapGesture { position in
-                    if let coordinate = proxy.convert(position, from: .local) {
-                        viewModel.addLocation(at: coordinate)
+                    .onTapGesture { position in
+                        if let coordinate = proxy.convert(position, from: .local) {
+                            viewModel.addLocation(at: coordinate)
+                        }
                     }
-                }
-                .sheet(item: $viewModel.selectedPlace) { place in
-                    EditView(location: place) {
-                        viewModel.update(location: $0)
+                    .sheet(item: $viewModel.selectedPlace) { place in
+                        EditView(location: place) {
+                            viewModel.update(location: $0)
+                        }
                     }
+                    .mapStyle(mapStyle == "standard" ? .standard : .hybrid)
                 }
-                .mapStyle(viewModel.standard ? .standard : .hybrid)
-            }
-            if viewModel.standard {
-                Button("Hybrid") {
-                    viewModel.toggleStandard()
+                
+                Picker("Map mode", selection: $mapStyle) {
+                    Text("Standard")
+                        .tag("standard")
+                    
+                    Text("Hybrid")
+                        .tag("hybrid")
                 }
-            } else {
-                Button("Standard") {
-                    viewModel.toggleStandard()
-                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
             }
         } else {
             Button("Unlock Places", action: viewModel.authenticate)
@@ -65,6 +69,11 @@ struct ContentView: View {
                 .background(.blue)
                 .foregroundStyle(.white)
                 .clipShape(.capsule)
+                .alert("Authentication Error", isPresented: $viewModel.isShowingAuthenticationError) {
+                    Button("OK") { }
+                } message: {
+                    Text(viewModel.authenticationError)
+                }
         }
     }
 }

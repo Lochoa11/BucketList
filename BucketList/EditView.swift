@@ -12,7 +12,7 @@ struct EditView: View {
     
     var onSave: (Location) -> Void
     
-    @State private var viewModel = ViewModel()
+    @State private var viewModel: ViewModel
     
     var body: some View {
         NavigationStack {
@@ -41,11 +41,7 @@ struct EditView: View {
             .navigationTitle("Place details")
             .toolbar {
                 Button("Save") {
-                    var newLocation = viewModel.location
-                    newLocation.id = UUID()
-                    newLocation.name = viewModel.name
-                    newLocation.description = viewModel.description
-                    
+                    let newLocation = viewModel.createNewLocation()                    
                     onSave(newLocation)
                     dismiss()
                 }
@@ -58,10 +54,7 @@ struct EditView: View {
     
     init(location: Location, onSave: @escaping (Location) -> Void) {        
         self.onSave = onSave
-        
-        viewModel.location = location
-        viewModel.name = location.name
-        viewModel.description = location.description
+        _viewModel = State(initialValue: ViewModel(location: location))
     }
 }
 
